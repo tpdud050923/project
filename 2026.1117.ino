@@ -42,9 +42,9 @@ DallasTemperature sensors(&onewire);
 float t = 0;
 
 // 비동기 온도 측정
-unsigned long tempRequestTime = 0;
-const unsigned long conversionTime = 750;
-bool conversionPending = false;
+unsigned long tempRequestTime = 0; // 측정시간
+const unsigned long conversionTime = 750; // 750ms 마다 한 번 온도측정
+bool conversionPending = false;  //변환 진행 중인가
 
 
 // 버튼
@@ -122,11 +122,11 @@ void setup() {
   sensors.begin();
 
   // 비동기 온도 측정 설정
-  sensors.setWaitForConversion(false);
+  sensors.setWaitForConversion(false); // 대기 시간 없이 넘어감
 
 
   // 버튼 설정
-  pinMode(BUTTON_PIN, INPUT_PULLDOWN);
+  pinMode(BUTTON_PIN, INPUT_PULLDOWN); 
 
 
   // LED 설정
@@ -507,29 +507,22 @@ void processTemperature() {
   // 최근 온도 변화량
   float change = samples[totcnt - 1] - samples[0];
 
-
-  // 작동 상태에서만 급격한 온도 변화 감지
-  if (state == start) {
-
-    if (change <= -changelimit) {
-      changecnt++;
-    }
-
-    else {
-      changecnt = 0;
-    }
-
-
-    if (changecnt >= 3) {
-
-      Serial.println("Sudden temperature change");
-
-      gosleep();
-
-    }
-
+  if (change <= -changelimit) {
+    changecnt++;
   }
 
+  else {
+    changecnt = 0;
+  }
+
+
+  if (changecnt >= 3) {
+
+    Serial.println("Sudden temperature change");
+
+    gosleep();
+
+  }
 
   // 온도 안정화 확인
   if (maxminus() < stablelimit) {
@@ -590,8 +583,7 @@ void loop() {
     rainbowled();
 
   }
-
-
+  
   // 비동기 온도 변환 완료 확인
   if (conversionPending &&
       millis() - tempRequestTime >= conversionTime) {
@@ -625,7 +617,7 @@ void loop() {
 
     tempRequestTime = millis();
 
-    conversionPending = true;
+    conversionPending = true; 
 
   }
 
